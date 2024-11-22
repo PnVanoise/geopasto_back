@@ -84,3 +84,14 @@ server {
 }
 
 ```
+
+# Création d'une nouvelle instance
+1. Créer une base de données vide, activer l'extension postgis (```create extension postgis```)
+2. Créer un utilisateur propriétaire de la bdd
+3. Récupérer les sources, créer venv, actualiser l'environnement python (```pip update -r -requirements.txt```)
+4. Récupèrer un fichier settings.py, l'actualiser avec les infos de la nouvelle bdd
+5. ```python manage.py makemigrations``` (ne va rien faire : les fichiers de migrations sont déjà existant)
+6. ```python manage.py migrate``` (doit exécuter les 6x migrations passées)
+
+La bdd doit être à jour.
+
