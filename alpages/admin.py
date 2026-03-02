@@ -2,11 +2,13 @@ from django.contrib.gis import admin
 from leaflet.admin import LeafletGeoAdmin
 from .models import Logement, QuartierUP, Commodite, LogementCommodite
 from .models import UnitePastorale, ProprietaireFoncier, QuartierPasto, UPProprietaire
-from .models import TypeConvention, ConventionDExploitation, Eleveur, Exploitant, EtreCompose, SubventionPNV, AbriDUrgence, BeneficierDe
+from .models import TypeConvention, ConventionDExploitation, Eleveur, TypeDExploitant, Exploitant, EtreCompose, SubventionPNV, AbriDUrgence, BeneficierDe
 from .models import SituationDExploitation, Exploiter
 from .models import TypeDeSuivi, PlanDeSuivi, TypeDeMesure, MesureDePlan
 from .models import Ruche, Berger, TypeCheptel, GardeSituation, Elever
+from .models import TypeEquipement, EquipementAlpage, EquipementExploitant
 from .models import TypeEvenement, Evenement
+from .models import Cheptel, Type_cheptel, Production, Categorie_pension, Espece, Race, Categorie_animaux
 
 from .models import LogementTest
 
@@ -26,6 +28,7 @@ admin.site.register(ConventionDExploitation, LeafletGeoAdmin)
 admin.site.register(SituationDExploitation, LeafletGeoAdmin)
 admin.site.register(Exploiter, LeafletGeoAdmin)
 admin.site.register(Eleveur, LeafletGeoAdmin)
+admin.site.register(TypeDExploitant, LeafletGeoAdmin)
 admin.site.register(Exploitant, LeafletGeoAdmin)
 admin.site.register(EtreCompose, LeafletGeoAdmin)
 admin.site.register(SubventionPNV, LeafletGeoAdmin)
@@ -49,5 +52,27 @@ admin.site.register(PlanDeSuivi, LeafletGeoAdmin)
 admin.site.register(TypeDeMesure, LeafletGeoAdmin)
 admin.site.register(MesureDePlan, LeafletGeoAdmin)
 
+# Equipements
+admin.site.register(TypeEquipement, LeafletGeoAdmin)
+admin.site.register(EquipementExploitant, LeafletGeoAdmin)
+admin.site.register(EquipementAlpage, LeafletGeoAdmin)
+
+
 # TEST CC
 admin.site.register(LogementTest, LeafletGeoAdmin)
+
+
+##################
+# Mise à jour Cheptels / types de cheptel
+# le 9/2/26
+
+admin.site.register(Cheptel, LeafletGeoAdmin)
+admin.site.register(Type_cheptel, LeafletGeoAdmin)
+admin.site.register(Production, LeafletGeoAdmin)
+admin.site.register(Categorie_pension, LeafletGeoAdmin)
+admin.site.register(Espece, LeafletGeoAdmin)
+admin.site.register(Race, LeafletGeoAdmin)
+admin.site.register(Categorie_animaux, LeafletGeoAdmin) 
+
+# FIN Mise à jour Cheptels / types de cheptel
+##################

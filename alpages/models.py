@@ -7,7 +7,7 @@ from .choices_logement import LST_STATUT, LST_ACCES_FINAL, LST_PROPRIETE, LST_TY
 # Bloc administratif (orange)
 class UnitePastorale(models.Model):
     """
-    Unité pastorale
+    Unité pastorales
     """
 
     id_unite_pastorale = models.BigIntegerField(primary_key=True)  
@@ -16,6 +16,7 @@ class UnitePastorale(models.Model):
     annee_version = models. BigIntegerField(null=False, blank=False)
     geometry = models.MultiPolygonField(srid=2154, null=False, blank=False)
     version_active = models.BooleanField(null=False, blank=False)
+    secteur = models.CharField(max_length=50, null=True, blank=True)
     # proprietaire = models.ForeignKey('alpages.ProprietaireFoncier', on_delete=models.SET_NULL, blank=True, null=True, related_name='unites_pastorales')
     
     def __str__(self):
@@ -168,7 +169,7 @@ class SituationDExploitation(models.Model):
     """
     
     id_situation = models.BigIntegerField(primary_key=True)
-    nom_situation = models.CharField(max_length=50, null=False, blank=False)
+    nom_situation = models.CharField(max_length=150, null=False, blank=False)
     situation_active = models.BooleanField(null=False, blank=False)
     date_debut = models.DateField(null=True, blank=True)
     date_fin = models.DateField(null=True, blank=True)
@@ -210,7 +211,19 @@ class Eleveur(models.Model):
     
     def __str__(self):
         return str(self.nom_eleveur)
+
+class TypeDExploitant(models.Model):
+    """
+    Type d'exploitant
+    """
+
+    id_type_exploitant = models.BigIntegerField(primary_key=True)  
+    description = models.CharField(max_length=50, null=False, blank=False)
     
+    def __str__(self):
+        return str(self.description) 
+
+
 class Exploitant(models.Model):
     """
     Exploitant
@@ -218,7 +231,7 @@ class Exploitant(models.Model):
     
     id_exploitant = models.BigIntegerField(primary_key=True)
     nom_exploitant = models.CharField(max_length=50, null=False, blank=False)
-    type = models.CharField(max_length=50, null=True, blank=True)
+    type_exploitant = models.ForeignKey('alpages.TypeDExploitant', on_delete=models.SET_NULL, blank=True, null=True, related_name='exploitants')
     president = models.ForeignKey('alpages.Eleveur', on_delete=models.SET_NULL, blank=True, null=True, related_name='exploitants')
     
     def __str__(self):
@@ -259,6 +272,10 @@ class Logement(models.Model):
     """
     
     logement_code = models.CharField(max_length=10)
+    # Ajouté le 28/10/2025
+    nom_logement = models.CharField(max_length=50, null=True, blank=True)
+    unite_pastorale = models.ForeignKey('alpages.UnitePastorale', on_delete=models.SET_NULL, blank=True, null=True, related_name='logements')
+    # Fin 28/10/2025
     statut = models.CharField(max_length=50, choices=LST_STATUT, null=True, blank=True)
     acces_final = models.CharField(max_length=50, choices=LST_ACCES_FINAL, null=True, blank=True)
     propriete = models.CharField(max_length=50, choices=LST_PROPRIETE, null=True, blank=True)
@@ -330,6 +347,25 @@ class AbriDUrgence(models.Model):
     def __str__(self):
         return str(self.description)
 
+
+class AbriDUrgenceCommodite(models.Model):
+    """
+    Association Abri d'urgence / Commodite
+    """
+    
+    id_abri_urgence_commodite = models.BigIntegerField(primary_key=True)
+    abri_urgence = models.ForeignKey('alpages.AbriDUrgence', on_delete=models.SET_NULL, blank=True, null=True, related_name='commodites')
+    commodite = models.ForeignKey('alpages.Commodite', on_delete=models.SET_NULL, blank=True, null=True, related_name='abris_urgence')
+    etat = models.CharField(max_length=50, null=False, blank=False)
+    commentaire = models.CharField(max_length=50, null=True, blank=True)
+    quantite = models.CharField(max_length=50, null=True, blank=True)
+    
+    
+    def __str__(self):
+        return f"{self.abri_urgence} a {self.quantite} de {self.commodite}"
+
+
+
 class BeneficierDe(models.Model):
     """
     Association Exploitant / Abri d'urgence
@@ -400,7 +436,6 @@ class TypeCheptel(models.Model):
     race = models.CharField(max_length=50, null=True, blank=True)
     production = models.CharField(max_length=50, null=True, blank=True)
     stade_maturite = models.CharField(max_length=50, null=True, blank=True)
-    pension = models.CharField(max_length=50, null=True, blank=True)
 
     def __str__(self):
         return str(self.description)
@@ -411,16 +446,117 @@ class Elever(models.Model):
     """
     
     id_elever = models.BigIntegerField(primary_key=True)
-    situation_exploitation = models.ForeignKey('alpages.SituationDExploitation', on_delete=models.SET_NULL, blank=True, null=True, related_name='eleveurs')
-    type_cheptel = models.ForeignKey('alpages.TypeCheptel', on_delete=models.SET_NULL, blank=True, null=True, related_name='eleveurs')
-    eleveur = models.ForeignKey('alpages.Eleveur', on_delete=models.SET_NULL, blank=True, null=True, related_name='eleveurs')
+    situation_exploitation = models.ForeignKey('alpages.SituationDExploitation', on_delete=models.SET_NULL, blank=True, null=True, related_name='elevers')
+    type_cheptel = models.ForeignKey('alpages.TypeCheptel', on_delete=models.SET_NULL, blank=True, null=True, related_name='elevers')
+    eleveur = models.ForeignKey('alpages.Eleveur', on_delete=models.SET_NULL, blank=True, null=True, related_name='elevers')
+
+    nombre_animaux = models.IntegerField(null=False, blank=False)
+    pension = models.CharField(max_length=50, null=True, blank=True)
+    date_debut = models.DateField(null=True, blank=True)
+    date_fin = models.DateField(null=True, blank=True)
+    
+    def __str__(self):
+        return f"{self.eleveur} élève {self.type_cheptel} dans la situation {self.situation_exploitation}"
+
+
+##################
+# Mise à jour Cheptels / types de cheptel
+# le 9/2/26
+class Production(models.Model):
+    """
+    Production
+    """
+    
+    id_production = models.BigIntegerField(primary_key=True)
+    description = models.CharField(max_length=50, null=False, blank=False)
+    
+    def __str__(self):
+        return str(self.description)
+
+class Categorie_pension(models.Model):
+    """
+    Catégorie de pension
+    """
+    
+    id_categorie_pension = models.BigIntegerField(primary_key=True)
+    description = models.CharField(max_length=50, null=False, blank=False)
+    
+    def __str__(self):
+        return str(self.description)
+
+class Espece(models.Model):
+    """
+    Espèce
+    """
+    
+    id_espece = models.BigIntegerField(primary_key=True)
+    description = models.CharField(max_length=50, null=False, blank=False)
+    
+    def __str__(self):
+        return str(self.description)
+
+class Race(models.Model):
+    """
+    Race
+    """
+
+    id_race = models.BigIntegerField(primary_key=True)
+    description = models.CharField(max_length=50, null=False, blank=False)
+    espece = models.ForeignKey('alpages.Espece', on_delete=models.SET_NULL, blank=True, null=True, related_name='races')
+
+    def __str__(self):
+        return str(self.description)
+
+class Categorie_animaux(models.Model):
+    """
+    Catégorie d'animaux
+    """
+    
+    id_categorie_animaux = models.BigIntegerField(primary_key=True)
+    description = models.CharField(max_length=50, null=False, blank=False)
+    espece = models.ForeignKey('alpages.Espece', on_delete=models.SET_NULL, blank=True, null=True, related_name='categories_animaux')
+    
+    def __str__(self):
+        return str(self.description)
+
+class Cheptel(models.Model):
+    """
+    Cheptel
+    """
+    
+    id_cheptel = models.BigIntegerField(primary_key=True)
+    description = models.CharField(max_length=50, null=False, blank=False)
+
+    eleveur = models.ForeignKey('alpages.Eleveur', on_delete=models.SET_NULL, blank=True, null=True, related_name='cheptels')
+    situation_exploitation = models.ForeignKey('alpages.SituationDExploitation', on_delete=models.SET_NULL, blank=True, null=True, related_name='cheptels')
+    type_cheptel = models.ForeignKey('alpages.Type_cheptel', on_delete=models.SET_NULL, blank=True, null=True, related_name='cheptels')
+    
     nombre_animaux = models.IntegerField(null=False, blank=False)
     date_debut = models.DateField(null=True, blank=True)
     date_fin = models.DateField(null=True, blank=True)
     
     def __str__(self):
         return f"{self.eleveur} élève {self.type_cheptel} dans la situation {self.situation_exploitation}"
+
+class Type_cheptel(models.Model):
+    """
+    Type de cheptel
+    """
     
+    id_type_cheptel = models.BigIntegerField(primary_key=True)
+    description = models.CharField(max_length=50, null=False, blank=False)
+    production = models.ForeignKey('alpages.Production', on_delete=models.SET_NULL, blank=True, null=True, related_name='types_cheptel')
+    pension = models.ForeignKey('alpages.Categorie_pension', on_delete=models.SET_NULL, blank=True, null=True, related_name='types_cheptel')
+    race = models.ForeignKey('alpages.Race', on_delete=models.SET_NULL, blank=True, null=True, related_name='types_cheptel')
+    categorie_animaux = models.ForeignKey('alpages.Categorie_animaux', on_delete=models.SET_NULL, blank=True, null=True, related_name='types_cheptel')
+
+    def __str__(self):
+        return str(self.description)
+
+
+# FIN Mise à jour Cheptels / types de cheptel
+##################
+
 # Evénements
 class TypeEvenement(models.Model):
     """
@@ -455,6 +591,44 @@ class Evenement(models.Model):
     
     def __str__(self):
         return str(self.description)
+
+
+# EQUIPEMENTS
+class TypeEquipement(models.Model):
+    """
+    Type d'équipement
+    """
+    
+    id_type_equipement = models.BigIntegerField(primary_key=True)
+    description = models.CharField(max_length=50, null=False, blank=False)
+    categorie = models.CharField(max_length=50, null=False, blank=False)
+
+    def __str__(self):
+        return str(self.description)
+
+class EquipementAlpage(models.Model):
+    """
+    Equipement d'alpage (lié à l'UP)
+    """
+
+    id_equipement_alpage = models.BigIntegerField(primary_key=True)
+    description = models.CharField(max_length=50, null=False, blank=False)
+    etat = models.CharField(max_length=50, null=False, blank=False)
+    geometry = models.GeometryField(srid=2154, null=True, blank=True)
+    type_equipement = models.ForeignKey('alpages.TypeEquipement', on_delete=models.SET_NULL, blank=True, null=True, related_name='eqptsAlpage')
+    unite_pastorale = models.ForeignKey('alpages.UnitePastorale', on_delete=models.SET_NULL, blank=True, null=True, related_name='eqptsAlpage')
+
+class EquipementExploitant(models.Model):
+    """
+    Equipement d'exploitant
+    """
+
+    id_equipement_exploitant = models.BigIntegerField(primary_key=True)
+    description = models.CharField(max_length=50, null=False, blank=False)
+    etat = models.CharField(max_length=50, null=False, blank=False)
+    geometry = models.GeometryField(srid=2154, null=True, blank=True)
+    type_equipement = models.ForeignKey('alpages.TypeEquipement', on_delete=models.SET_NULL, blank=True, null=True, related_name='eqptsExploitant')
+    exploitant = models.ForeignKey('alpages.Exploitant', on_delete=models.SET_NULL, blank=True, null=True, related_name='eqptsExploitant')
 
 
 # TEMPORAIRE DLG
