@@ -85,6 +85,42 @@ server {
 
 ```
 
+# Lancer les tests
+
+Les tests utilisent Django TestCase avec une base PostgreSQL+PostGIS.
+Le fichier `geoagri/settings.py` doit exister localement (non versionné).
+
+## Prérequis
+
+Installer les dépendances de développement (inclut `pytest` et `pytest-django`) :
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+## Option 1 — `manage.py test` (Django natif)
+
+```bash
+python manage.py test alpages.tests --verbosity=2
+```
+
+## Option 2 — `pytest` (recommandé pour VS Code)
+
+```bash
+pytest
+```
+
+Ou pour un fichier précis :
+
+```bash
+pytest alpages/tests/test_serializers.py -v
+```
+
+L'extension **Python** (ms-python.python) de VS Code détecte automatiquement les tests via `pytest` une fois `pytest-django` installé.  
+Le fichier `pytest.ini` à la racine du projet configure le module de settings Django.
+
+---
+
 # Création d'une nouvelle instance
 1. Créer une base de données vide, activer l'extension postgis (```create extension postgis```)
 2. Créer un utilisateur propriétaire de la bdd
