@@ -193,7 +193,7 @@ class Exploiter(models.Model):
     commentaire = models.CharField(max_length=500, null=True, blank=True)
     
     def __str__(self):
-        return f"{self.situation} exploite {self.quartier}"
+        return f"{self.situation_exploitation} exploite {self.quartier}"
 
 
 class Eleveur(models.Model):

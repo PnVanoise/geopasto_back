@@ -47,6 +47,7 @@ class UnitePastoraleLSerializer(serializers.ModelSerializer):
 
 
 class ProprietaireFoncierSerializer(serializers.ModelSerializer):
+    unites_pastorales = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     
     class Meta:
         model = ProprietaireFoncier
@@ -543,17 +544,6 @@ class Categorie_animauxSerializer(serializers.ModelSerializer):
         model = Categorie_animaux
         fields = [ 'id_categorie_animaux', 'description', 'espece' ]
 
-
-class CheptelSerializer(serializers.ModelSerializer):
-    """
-    Cheptel
-    """
-
-    class Meta:
-        model = Cheptel
-        fields = [ 'id_cheptel', 'description', 'eleveur', 'situation_exploitation', 'type_cheptel', 'nombre_animaux', 'date_debut', 'date_fin' ]
-
-
 class Type_cheptelSerializer(serializers.ModelSerializer):
     """
     Type de cheptel
@@ -562,6 +552,52 @@ class Type_cheptelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Type_cheptel
         fields = [ 'id_type_cheptel', 'description', 'production', 'pension', 'race', 'categorie_animaux' ]
+        
+class CheptelSerializer(serializers.ModelSerializer):
+    """
+    Cheptel
+    """
+    # Année
+    annee = serializers.SerializerMethodField()
+
+    # Eleveur
+    eleveur = serializers.PrimaryKeyRelatedField(
+        queryset = Eleveur.objects.all(),
+        allow_null = True,
+    )
+    eleveur_detail = EleveurSerializer(
+        source='eleveur',
+        read_only=True,
+    )
+    
+    # Type de cheptel
+    type_cheptel = serializers.PrimaryKeyRelatedField(
+        queryset = Type_cheptel.objects.all(),
+        allow_null = True,
+    )
+    type_cheptel_detail = Type_cheptelSerializer(
+        source='type_cheptel',
+        read_only=True,
+    )
+    # Situation d'exploitation
+    situation_exploitation = serializers.PrimaryKeyRelatedField(
+        queryset = SituationDExploitation.objects.all(),
+        allow_null = True,
+    )
+    situation_detail = SituationDExploitationSerializer(
+        source='situation_exploitation',
+        read_only=True
+    )    
+
+    class Meta:
+        model = Cheptel
+        fields = [ 'id_cheptel', 'date_debut', 'annee', 'date_fin', 'nombre_animaux', 'type_cheptel', 'type_cheptel_detail', 'eleveur', 'eleveur_detail', 
+                  'situation_exploitation', 'situation_detail', 'description' ]
+
+    def get_annee(self, obj):
+        if obj.date_debut:
+            return obj.date_debut.year
+        return None
 
 # FIN Mise à jour Cheptels / types de cheptel
 ##################
