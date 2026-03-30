@@ -10,7 +10,7 @@ from alpages.models import UnitePastorale, ProprietaireFoncier, QuartierPasto, U
 from alpages.models import TypeDeSuivi, PlanDeSuivi, TypeDeMesure, MesureDePlan
 from alpages.models import TypeConvention, ConventionDExploitation, Eleveur, TypeDExploitant, Exploitant, EtreCompose, SubventionPNV, AbriDUrgence, AbriDUrgenceCommodite, BeneficierDe
 from alpages.models import SituationDExploitation, Exploiter
-from alpages.models import Ruche, Berger, TypeCheptel, GardeSituation, Elever
+from alpages.models import Ruche, Berger, TypeCheptel, GardeSituation
 from alpages.models import TypeEvenement, Evenement
 from alpages.models import TypeEquipement, EquipementAlpage, EquipementExploitant
 from alpages.models import Production, Categorie_pension, Race, Categorie_animaux, Espece, Cheptel, Type_cheptel
@@ -455,47 +455,47 @@ class TypeCheptelSerializer(serializers.ModelSerializer):
         model = TypeCheptel
         fields = [ 'id_type_cheptel', 'description', 'espece', 'race', 'production', 'stade_maturite' ]
 
-class EleverSerializer(serializers.ModelSerializer):
-    # Année
-    annee = serializers.SerializerMethodField()
+# class EleverSerializer(serializers.ModelSerializer):
+#     # Année
+#     annee = serializers.SerializerMethodField()
 
-    # Eleveur
-    eleveur = serializers.PrimaryKeyRelatedField(
-        queryset = Eleveur.objects.all(),
-        allow_null = True,
-    )
-    eleveur_detail = EleveurSerializer(
-        source='eleveur',
-        read_only=True,
-    )
-    # Type de cheptel
-    type_cheptel = serializers.PrimaryKeyRelatedField(
-        queryset = TypeCheptel.objects.all(),
-        allow_null = True,
-    )
-    type_cheptel_detail = TypeCheptelSerializer(
-        source='type_cheptel',
-        read_only=True,
-    )
-    # Situation d'exploitation
-    situation_exploitation = serializers.PrimaryKeyRelatedField(
-        queryset = SituationDExploitation.objects.all(),
-        allow_null = True,
-    )
-    situation_detail = SituationDExploitationSerializer(
-        source='situation_exploitation',
-        read_only=True
-    )
+#     # Eleveur
+#     eleveur = serializers.PrimaryKeyRelatedField(
+#         queryset = Eleveur.objects.all(),
+#         allow_null = True,
+#     )
+#     eleveur_detail = EleveurSerializer(
+#         source='eleveur',
+#         read_only=True,
+#     )
+#     # Type de cheptel
+#     type_cheptel = serializers.PrimaryKeyRelatedField(
+#         queryset = TypeCheptel.objects.all(),
+#         allow_null = True,
+#     )
+#     type_cheptel_detail = TypeCheptelSerializer(
+#         source='type_cheptel',
+#         read_only=True,
+#     )
+#     # Situation d'exploitation
+#     situation_exploitation = serializers.PrimaryKeyRelatedField(
+#         queryset = SituationDExploitation.objects.all(),
+#         allow_null = True,
+#     )
+#     situation_detail = SituationDExploitationSerializer(
+#         source='situation_exploitation',
+#         read_only=True
+#     )
     
-    class Meta:
-        model = Elever
-        fields = [ 'id_elever', 'date_debut', 'annee', 'date_fin', 'nombre_animaux', 'type_cheptel', 'type_cheptel_detail', 'eleveur', 'eleveur_detail',
-                  'situation_exploitation', 'situation_detail' ]
+#     class Meta:
+#         model = Elever
+#         fields = [ 'id_elever', 'date_debut', 'annee', 'date_fin', 'nombre_animaux', 'type_cheptel', 'type_cheptel_detail', 'eleveur', 'eleveur_detail',
+#                   'situation_exploitation', 'situation_detail' ]
     
-    def get_annee(self, obj):
-        if obj.date_debut:
-            return obj.date_debut.year
-        return None
+#     def get_annee(self, obj):
+#         if obj.date_debut:
+#             return obj.date_debut.year
+#         return None
 
 
 ##################

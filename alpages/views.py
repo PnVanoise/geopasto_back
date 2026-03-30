@@ -19,8 +19,8 @@ from alpages.models import SituationDExploitation, Exploiter
 from alpages.models import Cheptel, Type_cheptel, Production, Categorie_pension, Espece, Race, Categorie_animaux
 from alpages.serializers import CheptelSerializer, Type_cheptelSerializer, ProductionSerializer, Categorie_pensionSerializer, EspeceSerializer, RaceSerializer, Categorie_animauxSerializer
 
-from alpages.models import Ruche, Berger, TypeCheptel, GardeSituation, Elever
-from alpages.serializers import RucheSerializer, BergerSerializer, TypeCheptelSerializer, GardeSituationSerializer, EleverSerializer
+from alpages.models import Ruche, Berger, TypeCheptel, GardeSituation
+from alpages.serializers import RucheSerializer, BergerSerializer, TypeCheptelSerializer, GardeSituationSerializer
 
 from alpages.models import TypeEvenement, Evenement
 from alpages.serializers import TypeEvenementSerializer, EvenementSerializer
@@ -227,7 +227,9 @@ class SituationDExploitationViewset(BaseModelViewSet):
             new.save()
 
             # debug counts
-            logger.debug(f"Orig related counts - exploitations={orig.exploitations.count()}, ruches={orig.ruches.count()}, gardes={orig.gardes_situation.count()}, elevers={getattr(orig, 'elevers').count() if hasattr(orig, 'elevers') else 'N/A'}")
+            # logger.debug(f"Orig related counts - exploitations={orig.exploitations.count()}, ruches={orig.ruches.count()}, gardes={orig.gardes_situation.count()}, elevers={getattr(orig, 'elevers').count() if hasattr(orig, 'elevers') else 'N/A'}")
+            logger.debug(f"Orig related counts - exploitations={orig.exploitations.count()}, ruches={orig.ruches.count()}, gardes={orig.gardes_situation.count()}, ")
+
 
             # Clone related objects: OUI exploitation des quartiers (Exploiter), PAS ruches (Ruche), PAS gardes_situation (GardeSituation), PAS eleveurs (Elever)
             # For each related object we create a copy linked to the new situation. For models that have date_debut/date_fin, set date_debut to today and date_fin to None.
@@ -250,21 +252,21 @@ class SituationDExploitationViewset(BaseModelViewSet):
                 pass
 
             # Elever (livestock) - clone related Elever objects
-            for el in orig.elevers.all():
-                logger.debug(f"Cloning Elever id={getattr(el,'id_elever',None)} eleveur={getattr(el,'eleveur_id',None)}")
-                last_el = Elever.objects.order_by('id_elever').last()
-                next_el_id = last_el.id_elever + 1 if last_el else 1
-                new_el = Elever(
-                    id_elever=next_el_id,
-                    situation_exploitation=new,
-                    type_cheptel=el.type_cheptel,
-                    eleveur=el.eleveur,
-                    nombre_animaux=el.nombre_animaux,
-                    pension=el.pension,
-                    date_debut=date.today(),
-                    date_fin=None,
-                )
-                new_el.save()
+            # for el in orig.elevers.all():
+            #     logger.debug(f"Cloning Elever id={getattr(el,'id_elever',None)} eleveur={getattr(el,'eleveur_id',None)}")
+            #     last_el = Elever.objects.order_by('id_elever').last()
+            #     next_el_id = last_el.id_elever + 1 if last_el else 1
+            #     new_el = Elever(
+            #         id_elever=next_el_id,
+            #         situation_exploitation=new,
+            #         type_cheptel=el.type_cheptel,
+            #         eleveur=el.eleveur,
+            #         nombre_animaux=el.nombre_animaux,
+            #         pension=el.pension,
+            #         date_debut=date.today(),
+            #         date_fin=None,
+            #     )
+            #     new_el.save()
 
             # Ruche - clone beehives linked to the situation
             try:
@@ -353,16 +355,16 @@ class TypeCheptelViewset(BaseModelViewSet):
         queryset = TypeCheptel.objects.all().order_by('id_type_cheptel')
         return queryset
 
-class EleverViewset(BaseModelViewSet):
-    serializer_class = EleverSerializer
+# class EleverViewset(BaseModelViewSet):
+#     serializer_class = EleverSerializer
 
-    def get_queryset(self):
-        queryset = Elever.objects.all().select_related('eleveur').select_related('type_cheptel').order_by('id_elever')
-        situation_id = self.request.GET.get('id_situation')
-        if situation_id is not None:
-            queryset = queryset.filter(situation_exploitation=situation_id)
+    # def get_queryset(self):
+    #     queryset = Elever.objects.all().select_related('eleveur').select_related('type_cheptel').order_by('id_elever')
+    #     situation_id = self.request.GET.get('id_situation')
+    #     if situation_id is not None:
+    #         queryset = queryset.filter(situation_exploitation=situation_id)
 
-        return queryset
+    #     return queryset
 
 # Evenements
 class TypeEvenementViewset(BaseModelViewSet):

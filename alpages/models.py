@@ -441,23 +441,23 @@ class TypeCheptel(models.Model):
     def __str__(self):
         return str(self.description)
 
-class Elever(models.Model):
-    """
-    Association Eleveur / Cheptel
-    """
+# class Elever(models.Model):
+#     """
+#     Association Eleveur / Cheptel
+#     """
     
-    id_elever = models.BigIntegerField(primary_key=True)
-    situation_exploitation = models.ForeignKey('alpages.SituationDExploitation', on_delete=models.SET_NULL, blank=True, null=True, related_name='elevers')
-    type_cheptel = models.ForeignKey('alpages.TypeCheptel', on_delete=models.SET_NULL, blank=True, null=True, related_name='elevers')
-    eleveur = models.ForeignKey('alpages.Eleveur', on_delete=models.SET_NULL, blank=True, null=True, related_name='elevers')
+#     id_elever = models.BigIntegerField(primary_key=True)
+#     situation_exploitation = models.ForeignKey('alpages.SituationDExploitation', on_delete=models.SET_NULL, blank=True, null=True, related_name='elevers')
+#     type_cheptel = models.ForeignKey('alpages.TypeCheptel', on_delete=models.SET_NULL, blank=True, null=True, related_name='elevers')
+#     eleveur = models.ForeignKey('alpages.Eleveur', on_delete=models.SET_NULL, blank=True, null=True, related_name='elevers')
 
-    nombre_animaux = models.IntegerField(null=False, blank=False)
-    pension = models.CharField(max_length=50, null=True, blank=True)
-    date_debut = models.DateField(null=True, blank=True)
-    date_fin = models.DateField(null=True, blank=True)
+#     nombre_animaux = models.IntegerField(null=False, blank=False)
+#     pension = models.CharField(max_length=50, null=True, blank=True)
+#     date_debut = models.DateField(null=True, blank=True)
+#     date_fin = models.DateField(null=True, blank=True)
     
-    def __str__(self):
-        return f"{self.eleveur} élève {self.type_cheptel} dans la situation {self.situation_exploitation}"
+#     def __str__(self):
+#         return f"{self.eleveur} élève {self.type_cheptel} dans la situation {self.situation_exploitation}"
 
 
 ##################

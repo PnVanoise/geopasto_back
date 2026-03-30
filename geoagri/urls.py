@@ -13,7 +13,7 @@ from alpages.views import TypeConventionViewset, ConventionDExploitationViewset,
 from alpages.views import SituationDExploitationViewset, ExploiterViewset
 from alpages.views import TypeDeSuiviViewset, PlanDeSuiviViewset, TypeDeMesureViewset, MesureDePlanViewset, EtreComposeViewset, SubventionPNVViewset, AbriDUrgenceViewset, AbriDUrgenceCommoditeViewset, BeneficierDeViewset
 
-from alpages.views import RucheViewset, BergerViewset, TypeCheptelViewset, GardeSituationViewset, EleverViewset
+from alpages.views import RucheViewset, BergerViewset, TypeCheptelViewset, GardeSituationViewset
 from alpages.views import TypeEvenementViewset, EvenementViewset
 
 from alpages.views import TypeEquipementViewset, EquipementExploitantViewset, EquipementAlpageViewset
@@ -60,7 +60,6 @@ router.register('ruche', RucheViewset, basename='ruche')
 router.register('berger', BergerViewset, basename='berger')
 router.register('typeCheptel', TypeCheptelViewset, basename='typecheptel')
 router.register('gardeSituation', GardeSituationViewset, basename='gardesituation')
-router.register('elever', EleverViewset, basename='elever')
 
 # Evenements
 router.register('typeEvenement', TypeEvenementViewset, basename='typeevenement')

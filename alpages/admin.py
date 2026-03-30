@@ -5,7 +5,7 @@ from .models import UnitePastorale, ProprietaireFoncier, QuartierPasto, UPPropri
 from .models import TypeConvention, ConventionDExploitation, Eleveur, TypeDExploitant, Exploitant, EtreCompose, SubventionPNV, AbriDUrgence, BeneficierDe
 from .models import SituationDExploitation, Exploiter
 from .models import TypeDeSuivi, PlanDeSuivi, TypeDeMesure, MesureDePlan
-from .models import Ruche, Berger, TypeCheptel, GardeSituation, Elever
+from .models import Ruche, Berger, TypeCheptel, GardeSituation
 from .models import TypeEquipement, EquipementAlpage, EquipementExploitant
 from .models import TypeEvenement, Evenement
 from .models import Cheptel, Type_cheptel, Production, Categorie_pension, Espece, Race, Categorie_animaux
@@ -40,7 +40,7 @@ admin.site.register(Ruche, LeafletGeoAdmin)
 admin.site.register(Berger, LeafletGeoAdmin)
 admin.site.register(TypeCheptel, LeafletGeoAdmin)
 admin.site.register(GardeSituation, LeafletGeoAdmin)
-admin.site.register(Elever, LeafletGeoAdmin)
+# admin.site.register(Elever, LeafletGeoAdmin)
 
 # Evenements
 admin.site.register(TypeEvenement, LeafletGeoAdmin)
