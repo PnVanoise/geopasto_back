@@ -224,6 +224,7 @@ class EleveurSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Eleveur
+        read_only_fields = ['id_eleveur']
         fields = [ 'id_eleveur', 'nom_eleveur', 'prenom_eleveur', 'adresse_eleveur', 'tel_eleveur', 'mail_eleveur', 'commentaire', 'nom_complet' ]
 
     def get_nom_complet(self, obj):
@@ -255,6 +256,7 @@ class ExploitantSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Exploitant
+        read_only_fields = ['id_exploitant']
         fields = ['id_exploitant', 'nom_exploitant', 'president', 'membres', 'membres_ids', 'type_exploitant', 'type_exploitant_detail']
 
     def get_membres_ids(self, obj):

@@ -132,6 +132,7 @@ class ProprietaireFoncierViewset(BaseModelViewSet):
         queryset = ProprietaireFoncier.objects.all().order_by('id_proprietaire')
         return queryset
     
+    
 class EspeceViewset(BaseModelViewSet):
     serializer_class = EspeceSerializer
 
@@ -145,36 +146,7 @@ class EspeceViewset(BaseModelViewSet):
     def get_queryset(self):
         queryset = PlanDeSuivi.objects.all().select_related('type_suivi').select_related('unite_pastorale').order_by('id_plan_suivi')
         return queryset
-    
-    # @action(detail=False, methods=['get'])
-    # def getNextId(self, request):
-    #     # Récupérer le dernier ID dans la table et retourner le suivant
-    #     last_plan = PlanDeSuivi.objects.order_by('id_plan_suivi').last()
-    #     next_id = last_plan.id_plan_suivi + 1 if last_plan else 1
-    #     return Response({'next_id': next_id})
-    
-    # def create(self, request, *args, **kwargs):
-    #     logger.debug(f"Plan de suivi - Received data for creation: {request.data}")
-    #     serializer = self.get_serializer(data=request.data)
-    #     if serializer.is_valid():
-    #         self.perform_create(serializer)
-    #         logger.debug(f"Created instance: {serializer.data}")
-    #         headers = self.get_success_headers(serializer.data)
-    #         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-    #     logger.warning(f"Validation errors during creation: {serializer.errors}")
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # def update(self, request, *args, **kwargs):
-    #     logger.debug(f"Plan de suivi - Received data for update: {request.data}")
-    #     partial = kwargs.pop('partial', False)
-    #     instance = self.get_object()
-    #     serializer = self.get_serializer(instance, data=request.data, partial=partial)
-    #     if serializer.is_valid():
-    #         self.perform_update(serializer)
-    #         logger.debug(f"Updated instance: {serializer.data}")
-    #         return Response(serializer.data)
-    #     logger.warning(f"Validation errors during update: {serializer.errors}")
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class TypeDeMesureViewset(BaseModelViewSet):
     serializer_class = TypeDeMesureSerializer
@@ -182,36 +154,7 @@ class TypeDeMesureViewset(BaseModelViewSet):
     def get_queryset(self):
         queryset = TypeDeMesure.objects.all().order_by('id_type_mesure')
         return queryset
-    
-    # @action(detail=False, methods=['get'])
-    # def getNextId(self, request):
-    #     # Récupérer le dernier ID dans la table et retourner le suivant
-    #     last_type = TypeDeMesure.objects.order_by('id_type_mesure').last()
-    #     next_id = last_type.id_type_mesure + 1 if last_type else 1
-    #     return Response({'next_id': next_id})
-    
-    # def create(self, request, *args, **kwargs):
-    #     logger.debug(f"Type de mesure - Received data for creation: {request.data}")
-    #     serializer = self.get_serializer(data=request.data)
-    #     if serializer.is_valid():
-    #         self.perform_create(serializer)
-    #         logger.debug(f"Created instance: {serializer.data}")
-    #         headers = self.get_success_headers(serializer.data)
-    #         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-    #     logger.warning(f"Validation errors during creation: {serializer.errors}")
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    # def update(self, request, *args, **kwargs):
-    #     logger.debug(f"Type de mesure - Received data for update: {request.data}")
-    #     partial = kwargs.pop('partial', False)
-    #     instance = self.get_object()
-    #     serializer = self.get_serializer(instance, data=request.data, partial=partial)
-    #     if serializer.is_valid():
-    #         self.perform_update(serializer)
-    #         logger.debug(f"Updated instance: {serializer.data}")
-    #         return Response(serializer.data)
-    #     logger.warning(f"Validation errors during update: {serializer.errors}")
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class MesureDePlanViewset(BaseModelViewSet):
     serializer_class = MesureDePlanSerializer

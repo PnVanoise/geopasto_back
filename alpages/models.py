@@ -72,7 +72,7 @@ class TypeDeSuivi(models.Model):
     Type de Suivi
     """
 
-    id_type_suivi = models.BigIntegerField(primary_key=True)  
+    id_type_suivi = models.AutoField(primary_key=True)
     description = models.CharField(max_length=50, null=False, blank=False)
     
     def __str__(self):
@@ -99,7 +99,7 @@ class TypeDeMesure(models.Model):
     Type de mesure
     """
 
-    id_type_mesure = models.BigIntegerField(primary_key=True)
+    id_type_mesure = models.AutoField(primary_key=True)
     description = models.CharField(max_length=50, null=False, blank=False)
 
     def __str__(self):
@@ -131,7 +131,7 @@ class TypeConvention(models.Model):
     Type de convention
     """
     
-    id_type_convention = models.BigIntegerField(primary_key=True)
+    id_type_convention = models.AutoField(primary_key=True)
     description = models.CharField(max_length=50, null=False, blank=False)
 
     def __str__(self):
@@ -201,7 +201,7 @@ class Eleveur(models.Model):
     Eleveur
     """
     
-    id_eleveur = models.BigIntegerField(primary_key=True)
+    id_eleveur = models.AutoField(primary_key=True)  # Migration vers AutoField pour id_eleveur, dlg 10/2/26
     nom_eleveur = models.CharField(max_length=50, null=False, blank=False)
     prenom_eleveur = models.CharField(max_length=50, null=True, blank=True)
     tel_eleveur = models.CharField(max_length=50, null=True, blank=True)
@@ -217,7 +217,7 @@ class TypeDExploitant(models.Model):
     Type d'exploitant
     """
 
-    id_type_exploitant = models.BigIntegerField(primary_key=True)  
+    id_type_exploitant = models.AutoField(primary_key=True)
     description = models.CharField(max_length=50, null=False, blank=False)
     
     def __str__(self):
@@ -229,7 +229,8 @@ class Exploitant(models.Model):
     Exploitant
     """
     
-    id_exploitant = models.BigIntegerField(primary_key=True)
+    # id_exploitant = models.BigIntegerField(primary_key=True)
+    id_exploitant = models.AutoField(primary_key=True)  # Migration vers AutoField pour id_exploitant, dlg 10/2/26
     nom_exploitant = models.CharField(max_length=50, null=False, blank=False)
     type_exploitant = models.ForeignKey('alpages.TypeDExploitant', on_delete=models.SET_NULL, blank=True, null=True, related_name='exploitants')
     president = models.ForeignKey('alpages.Eleveur', on_delete=models.SET_NULL, blank=True, null=True, related_name='exploitants')
@@ -430,7 +431,7 @@ class TypeCheptel(models.Model):
     Type de cheptel
     """
     
-    id_type_cheptel = models.BigIntegerField(primary_key=True)
+    id_type_cheptel = models.AutoField(primary_key=True)
     description = models.CharField(max_length=50, null=False, blank=False)
     espece = models.CharField(max_length=50, null=False, blank=False)
     race = models.CharField(max_length=50, null=True, blank=True)
@@ -467,7 +468,7 @@ class Production(models.Model):
     Production
     """
     
-    id_production = models.BigIntegerField(primary_key=True)
+    id_production = models.AutoField(primary_key=True)
     description = models.CharField(max_length=50, null=False, blank=False)
     
     def __str__(self):
@@ -478,7 +479,7 @@ class Categorie_pension(models.Model):
     Catégorie de pension
     """
     
-    id_categorie_pension = models.BigIntegerField(primary_key=True)
+    id_categorie_pension = models.AutoField(primary_key=True)
     description = models.CharField(max_length=50, null=False, blank=False)
     
     def __str__(self):
@@ -489,7 +490,7 @@ class Espece(models.Model):
     Espèce
     """
     
-    id_espece = models.BigIntegerField(primary_key=True)
+    id_espece  = models.AutoField(primary_key=True)
     description = models.CharField(max_length=50, null=False, blank=False)
     
     def __str__(self):
@@ -500,7 +501,7 @@ class Race(models.Model):
     Race
     """
 
-    id_race = models.BigIntegerField(primary_key=True)
+    id_race = models.AutoField(primary_key=True)
     description = models.CharField(max_length=50, null=False, blank=False)
     espece = models.ForeignKey('alpages.Espece', on_delete=models.SET_NULL, blank=True, null=True, related_name='races')
 
@@ -512,7 +513,7 @@ class Categorie_animaux(models.Model):
     Catégorie d'animaux
     """
     
-    id_categorie_animaux = models.BigIntegerField(primary_key=True)
+    id_categorie_animaux = models.AutoField(primary_key=True)
     description = models.CharField(max_length=50, null=False, blank=False)
     espece = models.ForeignKey('alpages.Espece', on_delete=models.SET_NULL, blank=True, null=True, related_name='categories_animaux')
     
@@ -543,7 +544,7 @@ class Type_cheptel(models.Model):
     Type de cheptel
     """
     
-    id_type_cheptel = models.BigIntegerField(primary_key=True)
+    id_type_cheptel = models.AutoField(primary_key=True)
     description = models.CharField(max_length=50, null=False, blank=False)
     production = models.ForeignKey('alpages.Production', on_delete=models.SET_NULL, blank=True, null=True, related_name='types_cheptel')
     pension = models.ForeignKey('alpages.Categorie_pension', on_delete=models.SET_NULL, blank=True, null=True, related_name='types_cheptel')
@@ -563,7 +564,7 @@ class TypeEvenement(models.Model):
     Type d'événement
     """
     
-    id_type_evenement = models.BigIntegerField(primary_key=True)
+    id_type_evenement = models.AutoField(primary_key=True)
     description = models.CharField(max_length=50, null=False, blank=False)
     
     def __str__(self):
@@ -599,7 +600,7 @@ class TypeEquipement(models.Model):
     Type d'équipement
     """
     
-    id_type_equipement = models.BigIntegerField(primary_key=True)
+    id_type_equipement = models.AutoField(primary_key=True)
     description = models.CharField(max_length=50, null=False, blank=False)
     categorie = models.CharField(max_length=50, null=False, blank=False)
 
