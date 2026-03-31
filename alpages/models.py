@@ -38,15 +38,13 @@ class ProprietaireFoncier(models.Model):
     def __str__(self):
         return str(self.nom_propr)
     
-# UP_Proprietaire = (#id_unite_pastorale, #id_proprietaire);
-class UPProprietaire(models.Model):
+class ProprietaireUnitePastorale(models.Model):
     """
-    Association Unité pastorale / Propriétaire foncier
+    Association Propriétaire foncier / Unité pastorale
     """
     
-    id_up_proprietaire = models.BigIntegerField(primary_key=True)  
-    unite_pastorale = models.ForeignKey('alpages.UnitePastorale', on_delete=models.SET_NULL, blank=True, null=True, related_name='proprietaires')
-    proprietaire = models.ForeignKey('alpages.ProprietaireFoncier', on_delete=models.SET_NULL, blank=True, null=True, related_name='unites_pastorales')
+    proprietaire = models.ForeignKey('alpages.ProprietaireFoncier', on_delete=models.SET_NULL, blank=True, null=True, related_name='unites_pastorales_proprietaire')
+    unite_pastorale = models.ForeignKey('alpages.UnitePastorale', on_delete=models.SET_NULL, blank=True, null=True, related_name='proprietaires_unite_pastorale')
     
     def __str__(self):
         return f"{self.proprietaire} est propriétaire de {self.unite_pastorale}"

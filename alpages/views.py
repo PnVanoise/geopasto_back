@@ -5,7 +5,7 @@ from alpages.viewsets_base import BaseModelViewSet
 from rest_framework.decorators import api_view, action
 
 from alpages.models import Logement, Commodite, LogementCommodite
-from alpages.models import UnitePastorale, ProprietaireFoncier, QuartierPasto, UPProprietaire
+from alpages.models import UnitePastorale, ProprietaireFoncier, QuartierPasto, ProprietaireUnitePastorale
 from alpages.models import TypeDeSuivi, PlanDeSuivi, TypeDeMesure, MesureDePlan
 from alpages.models import TypeConvention, ConventionDExploitation, Eleveur, TypeDExploitant, Exploitant, EtreCompose, SubventionPNV, AbriDUrgence, AbriDUrgenceCommodite, BeneficierDe
 from alpages.models import SituationDExploitation, Exploiter
@@ -20,7 +20,7 @@ from alpages.models import TypeEvenement, Evenement
 from alpages.serializers import TypeEvenementSerializer, EvenementSerializer
 
 from alpages.serializers import LogementSerializer, CommoditeSerializer, LogementCommoditeSerializer
-from alpages.serializers import UnitePastoraleSerializer, UnitePastoraleLSerializer, ProprietaireFoncierSerializer, QuartierPastoSerializer, UPProprietaireSerializer
+from alpages.serializers import UnitePastoraleSerializer, UnitePastoraleLSerializer, ProprietaireFoncierSerializer, QuartierPastoSerializer, ProprietaireUnitePastoraleSerializer
 from alpages.serializers import TypeDeSuiviSerializer, PlanDeSuiviSerializer, TypeDeMesureSerializer, MesureDePlanSerializer
 from alpages.serializers import TypeConventionSerializer, ConventionDExploitationSerializer, EleveurSerializer, TypeDExploitantSerializer, ExploitantSerializer, EtreComposeSerializer, SubventionPNVSerializer, AbriDUrgenceSerializer, AbriDUrgenceCommoditeSerializer, BeneficierDeSerializer
 from alpages.serializers import SituationDExploitationSerializer, ExploiterSerializer
@@ -482,13 +482,14 @@ class Categorie_animauxViewset(BaseModelViewSet):
 # dlg le 10/2/26
 ###########
 
-# Restored historical viewsets (from removed_viewsets_review.py)
-class UPProprietaireViewset(BaseModelViewSet):
-    serializer_class = UPProprietaireSerializer
+
+class ProprietaireUnitePastoraleViewset(BaseModelViewSet):
+    serializer_class = ProprietaireUnitePastoraleSerializer
 
     def get_queryset(self):
-        queryset = UPProprietaire.objects.all().order_by('id_up_proprietaire')
+        queryset = ProprietaireUnitePastorale.objects.all()
         return queryset
+
 
 class QuartierPastoViewset(BaseModelViewSet):
     serializer_class = QuartierPastoSerializer
@@ -558,7 +559,7 @@ class EtreComposeViewset(BaseModelViewSet):
     serializer_class = EtreComposeSerializer
 
     def get_queryset(self):
-        queryset = EtreCompose.objects.all().order_by('id')
+        queryset = EtreCompose.objects.all()
         return queryset
 
 class SubventionPNVViewset(BaseModelViewSet):

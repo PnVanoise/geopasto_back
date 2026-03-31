@@ -8,7 +8,7 @@ from rest_framework import routers
 # )
 
 from alpages.views import LogementViewset, get_choices_logement, CommoditeViewset, LogementCommoditeViewset
-from alpages.views import UnitePastoraleViewset, ProprietaireFoncierViewset, QuartierPastoViewset, UPProprietaireViewset
+from alpages.views import UnitePastoraleViewset, ProprietaireFoncierViewset, QuartierPastoViewset, ProprietaireUnitePastoraleViewset
 from alpages.views import TypeConventionViewset, ConventionDExploitationViewset, EleveurViewset, TypeDExploitantViewset, ExploitantViewset
 from alpages.views import SituationDExploitationViewset, ExploiterViewset
 from alpages.views import TypeDeSuiviViewset, PlanDeSuiviViewset, TypeDeMesureViewset, MesureDePlanViewset, EtreComposeViewset, SubventionPNVViewset, AbriDUrgenceViewset, AbriDUrgenceCommoditeViewset, BeneficierDeViewset
@@ -37,7 +37,7 @@ router.register('abriDUrgenceCommodite', AbriDUrgenceCommoditeViewset, basename=
 router.register('unitePastorale', UnitePastoraleViewset, basename='unitepastorale')
 router.register('proprietaireFoncier', ProprietaireFoncierViewset, basename='proprietairefoncier')
 router.register('quartierPasto', QuartierPastoViewset, basename='quartierpasto')
-router.register('upproprietaire', UPProprietaireViewset, basename='upproprietaire')
+router.register('proprietaireUP', ProprietaireUnitePastoraleViewset, basename='proprietaireunitepastorale')
 
 router.register('typeConvention', TypeConventionViewset, basename='typeconvention')
 router.register('conventionExploitation', ConventionDExploitationViewset, basename='conventionexploitation')
