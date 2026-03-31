@@ -1,16 +1,10 @@
 import logging
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 from alpages.viewsets_base import BaseModelViewSet
 from rest_framework.decorators import api_view, action
 
-from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
-from django.contrib.auth.models import Permission
-# from django.contrib.contenttypes.models import ContentType
-
-from alpages.models import Logement, QuartierUP, Quartieralpage, Commodite, LogementCommodite
+from alpages.models import Logement, Commodite, LogementCommodite
 from alpages.models import UnitePastorale, ProprietaireFoncier, QuartierPasto, UPProprietaire
 from alpages.models import TypeDeSuivi, PlanDeSuivi, TypeDeMesure, MesureDePlan
 from alpages.models import TypeConvention, ConventionDExploitation, Eleveur, TypeDExploitant, Exploitant, EtreCompose, SubventionPNV, AbriDUrgence, AbriDUrgenceCommodite, BeneficierDe
@@ -25,7 +19,7 @@ from alpages.serializers import RucheSerializer, BergerSerializer, TypeCheptelSe
 from alpages.models import TypeEvenement, Evenement
 from alpages.serializers import TypeEvenementSerializer, EvenementSerializer
 
-from alpages.serializers import LogementSerializer, QuartierUPSerializer, QuartieralpageSerializer, CommoditeSerializer, LogementCommoditeSerializer
+from alpages.serializers import LogementSerializer, CommoditeSerializer, LogementCommoditeSerializer
 from alpages.serializers import UnitePastoraleSerializer, UnitePastoraleLSerializer, ProprietaireFoncierSerializer, QuartierPastoSerializer, UPProprietaireSerializer
 from alpages.serializers import TypeDeSuiviSerializer, PlanDeSuiviSerializer, TypeDeMesureSerializer, MesureDePlanSerializer
 from alpages.serializers import TypeConventionSerializer, ConventionDExploitationSerializer, EleveurSerializer, TypeDExploitantSerializer, ExploitantSerializer, EtreComposeSerializer, SubventionPNVSerializer, AbriDUrgenceSerializer, AbriDUrgenceCommoditeSerializer, BeneficierDeSerializer
@@ -75,34 +69,6 @@ def get_choices_logement(request):
     }
     return Response(data)
 
-# Droits utilisateurs / Permissions
-class UserPermissionsView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        user = request.user
-        
-        # Récupérer toutes les permissions de l'utilisateur
-        user_permissions = user.get_all_permissions()
-        
-        # Récupérer les permissions détaillées
-        all_permissions = Permission.objects.filter(codename__in=[
-            perm.split('.')[1] for perm in user_permissions
-        ]).select_related('content_type')
-        
-        # Grouper les permissions par modèle
-        grouped_permissions = {}
-        for perm in all_permissions:
-            model = perm.content_type.model  # Le modèle auquel appartient la permission
-            if model not in grouped_permissions:
-                grouped_permissions[model] = []
-            grouped_permissions[model].append(perm.codename)
-        
-        return Response({
-            'username': user.username,
-            'permissions_by_model': grouped_permissions,
-        })
-
 
 # Bloc administratif (orange)
 class UnitePastoraleViewset(BaseModelViewSet):
@@ -123,6 +89,7 @@ class UnitePastoraleViewset(BaseModelViewSet):
         queryset = self.get_queryset()
         serializer = UnitePastoraleLSerializer(queryset, many=True)
         return Response(serializer.data)
+
 
    
 class ProprietaireFoncierViewset(BaseModelViewSet):
