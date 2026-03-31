@@ -6,7 +6,7 @@ from django.contrib.gis.geos import Polygon
 from django.contrib.gis.db.models.functions import Distance
 
 from alpages.models import Logement, QuartierUP, Quartieralpage, Commodite, LogementCommodite
-from alpages.models import UnitePastorale, ProprietaireFoncier, QuartierPasto, UPProprietaire
+from alpages.models import UnitePastorale, ProprietaireFoncier, QuartierPasto, ProprietaireUnitePastorale
 from alpages.models import TypeDeSuivi, PlanDeSuivi, TypeDeMesure, MesureDePlan
 from alpages.models import TypeConvention, ConventionDExploitation, Eleveur, TypeDExploitant, Exploitant, EtreCompose, SubventionPNV, AbriDUrgence, AbriDUrgenceCommodite, BeneficierDe
 from alpages.models import SituationDExploitation, Exploiter
@@ -20,7 +20,12 @@ from alpages.models import LogementTest
 
 # Bloc administratif (orange)
 class UnitePastoraleSerializer(GeoFeatureModelSerializer):
-    
+
+    proprios = serializers.ListField(
+        child=serializers.IntegerField(), write_only=True
+    )
+    proprios_ids = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = UnitePastorale
         geo_field = 'geometry'
@@ -37,6 +42,47 @@ class UnitePastoraleSerializer(GeoFeatureModelSerializer):
                 pass
 
         return super().to_representation(instance)
+        
+    def get_proprios_ids(self, obj):
+        # Récupérer uniquement les IDs des propriétaires associés via ProprietaireUnitePastorale
+        proprios = ProprietaireUnitePastorale.objects.filter(unite_pastorale=obj).values_list('proprietaire_id', flat=True)
+        return list(proprios)
+
+    def create(self, validated_data):
+        proprios_data = validated_data.pop('proprios', [])
+        up = UnitePastorale.objects.create(**validated_data)
+        
+        # Ajout des propriétaires dans la table EtreCompose
+        for proprio_id in proprios_data:
+            proprio = ProprietaireFoncier.objects.get(id_proprietaire=proprio_id)
+            ProprietaireUnitePastorale.objects.create(unite_pastorale=up, proprietaire=proprio)
+            
+        return up
+
+    def update(self, instance, validated_data):
+        proprios_data = validated_data.pop('proprios', [])
+        
+        with transaction.atomic():
+            instance.save()
+
+            # Récupérer les IDs actuels des propriétaires de l'unité pastorale
+            proprios_actuels = set(ProprietaireUnitePastorale.objects.filter(unite_pastorale=instance).values_list('proprietaire_id', flat=True))
+            nouveaux_proprios = set(proprios_data)
+
+            # Supprimer les proprios qui ne sont plus associés
+            proprios_a_supprimer = proprios_actuels - nouveaux_proprios
+            if proprios_a_supprimer:
+                ProprietaireUnitePastorale.objects.filter(unite_pastorale=instance, proprietaire_id__in=proprios_a_supprimer).delete()
+
+            # Ajouter les nouveaux proprios
+            proprios_a_ajouter = nouveaux_proprios - proprios_actuels
+            for proprio_id in proprios_a_ajouter:
+                propr = ProprietaireFoncier.objects.get(id_proprietaire=proprio_id)
+                ProprietaireUnitePastorale.objects.create(unite_pastorale=instance, proprietaire=propr)
+
+        return instance
+
+
 
 # light serializer, pour les listes
 class UnitePastoraleLSerializer(serializers.ModelSerializer):
@@ -54,14 +100,13 @@ class ProprietaireFoncierSerializer(serializers.ModelSerializer):
         fields = [ 'id_proprietaire', 'nom_propr', 'prenom_propr',
                   'tel_propr', 'mail_propr', 'adresse_propr', 'commentaire', 'unites_pastorales' ]
 
-class UPProprietaireSerializer(serializers.ModelSerializer):
-    up_nom = serializers.CharField(source='unite_pastorale.nom_up', read_only=True)
-    proprietaire_nom = serializers.CharField(source='proprietaire.nom_propr', read_only=True)
+class ProprietaireUnitePastoraleSerializer(serializers.ModelSerializer):
     
     class Meta:
-        model = UPProprietaire
-        fields = [ 'id_up_proprietaire', 'unite_pastorale', 'proprietaire', 'up_nom', 'proprietaire_nom' ]
-    
+        model = ProprietaireUnitePastorale
+        fields = [ 'proprietaire', 'unite_pastorale' ]
+
+
 class QuartierPastoSerializer(GeoFeatureModelSerializer):
     unitepastorale_nom = serializers.SerializerMethodField(read_only=True)
     
@@ -240,10 +285,10 @@ class TypeDExploitantSerializer(serializers.ModelSerializer):
     
 
 class ExploitantSerializer(serializers.ModelSerializer):
-    membres = serializers.ListField(
+    proprios = serializers.ListField(
         child=serializers.IntegerField(), write_only=True
     )
-    membres_ids = serializers.SerializerMethodField(read_only=True)
+    proprios_ids = serializers.SerializerMethodField(read_only=True)
 
     type_exploitant = serializers.PrimaryKeyRelatedField(
         queryset = TypeDExploitant.objects.all(), allow_null = True
@@ -257,26 +302,26 @@ class ExploitantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Exploitant
         read_only_fields = ['id_exploitant']
-        fields = ['id_exploitant', 'nom_exploitant', 'president', 'membres', 'membres_ids', 'type_exploitant', 'type_exploitant_detail']
+        fields = ['id_exploitant', 'nom_exploitant', 'president', 'proprios', 'proprios_ids', 'type_exploitant', 'type_exploitant_detail']
 
-    def get_membres_ids(self, obj):
+    def get_proprios_ids(self, obj):
         # Récupérer uniquement les IDs des éleveurs associés via la table `EtreCompose`
-        membres = EtreCompose.objects.filter(exploitant=obj).values_list('eleveur_id', flat=True)
-        return list(membres)
+        proprios = EtreCompose.objects.filter(exploitant=obj).values_list('eleveur_id', flat=True)
+        return list(proprios)
 
     def create(self, validated_data):
-        membres_data = validated_data.pop('membres', [])
+        proprios_data = validated_data.pop('proprios', [])
         exploitant = Exploitant.objects.create(**validated_data)
         
-        # Ajout des membres dans la table EtreCompose
-        for eleveur_id in membres_data:
+        # Ajout des proprios dans la table EtreCompose
+        for eleveur_id in proprios_data:
             eleveur = Eleveur.objects.get(id_eleveur=eleveur_id)
             EtreCompose.objects.create(exploitant=exploitant, eleveur=eleveur)
 
         return exploitant
 
     def update(self, instance, validated_data):
-        membres_data = validated_data.pop('membres', [])
+        proprios_data = validated_data.pop('proprios', [])
         instance.nom_exploitant = validated_data.get('nom_exploitant', instance.nom_exploitant)
         # instance.type = validated_data.get('type', instance.type)
         instance.president = validated_data.get('president', instance.president)
@@ -285,18 +330,18 @@ class ExploitantSerializer(serializers.ModelSerializer):
         with transaction.atomic():
             instance.save()
 
-            # Récupérer les IDs actuels des membres de l'exploitant
-            membres_actuels = set(EtreCompose.objects.filter(exploitant=instance).values_list('eleveur_id', flat=True))
-            nouveaux_membres = set(membres_data)
+            # Récupérer les IDs actuels des proprios de l'exploitant
+            proprios_actuels = set(EtreCompose.objects.filter(exploitant=instance).values_list('eleveur_id', flat=True))
+            nouveaux_proprios = set(proprios_data)
 
-            # Supprimer les membres qui ne sont plus associés
-            membres_a_supprimer = membres_actuels - nouveaux_membres
-            if membres_a_supprimer:
-                EtreCompose.objects.filter(exploitant=instance, eleveur_id__in=membres_a_supprimer).delete()
+            # Supprimer les proprios qui ne sont plus associés
+            proprios_a_supprimer = proprios_actuels - nouveaux_proprios
+            if proprios_a_supprimer:
+                EtreCompose.objects.filter(exploitant=instance, eleveur_id__in=proprios_a_supprimer).delete()
 
-            # Ajouter les nouveaux membres
-            membres_a_ajouter = nouveaux_membres - membres_actuels
-            for eleveur_id in membres_a_ajouter:
+            # Ajouter les nouveaux proprios
+            proprios_a_ajouter = nouveaux_proprios - proprios_actuels
+            for eleveur_id in proprios_a_ajouter:
                 eleveur = Eleveur.objects.get(id_eleveur=eleveur_id)
                 EtreCompose.objects.create(exploitant=instance, eleveur=eleveur)
 
