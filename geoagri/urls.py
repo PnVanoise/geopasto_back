@@ -2,10 +2,10 @@ from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
 
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
+# from rest_framework_simplejwt.views import (
+#     TokenObtainPairView,
+#     TokenRefreshView,
+# )
 
 from alpages.views import LogementViewset, get_choices_logement, CommoditeViewset, LogementCommoditeViewset
 from alpages.views import UnitePastoraleViewset, ProprietaireFoncierViewset, QuartierPastoViewset, UPProprietaireViewset
@@ -24,10 +24,9 @@ from alpages.views import TypeEquipementViewset, EquipementExploitantViewset, Eq
 from alpages.views import CheptelViewset, Type_cheptelViewset, ProductionViewset, Categorie_pensionViewset, EspeceViewset, RaceViewset, Categorie_animauxViewset
 ##########
 
-# Permissions - Test DLG
-from alpages.views import UserPermissionsView
-
 router = routers.SimpleRouter()
+
+
 router.register('logement', LogementViewset, basename='logement')
 router.register('commodite', CommoditeViewset, basename='commodite')
 router.register('logementCommodite', LogementCommoditeViewset, basename='logementcommodite')
@@ -89,10 +88,8 @@ router.register('categorie_animaux', Categorie_animauxViewset, basename='categor
 
 
 urlpatterns = [
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('admin/', admin.site.urls),
     path('choices_logement/', get_choices_logement, name='get_choices_logement'),
     path('api/', include(router.urls)),
-    path('api/userpermissions/', UserPermissionsView.as_view(), name='userpermissions'),
+    path('', include('accounts.urls')),
 ]
