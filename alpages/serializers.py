@@ -20,7 +20,6 @@ from alpages.models import LogementTest
 
 # Bloc administratif (orange)
 class UnitePastoraleSerializer(GeoFeatureModelSerializer):
-
     proprios = serializers.ListField(
         child=serializers.IntegerField(), write_only=True
     )
@@ -30,7 +29,8 @@ class UnitePastoraleSerializer(GeoFeatureModelSerializer):
         model = UnitePastorale
         geo_field = 'geometry'
         auto_bbox = True
-        fields = '__all__'
+        # fields = '__all__'
+        fields = [ 'id_unite_pastorale', 'code_up', 'nom_up', 'annee_version', 'geometry', 'version_active', 'secteur', 'proprios', 'proprios_ids' ]
     
     def to_representation(self, instance):
         geom = getattr(instance, 'geometry', None)
@@ -63,6 +63,10 @@ class UnitePastoraleSerializer(GeoFeatureModelSerializer):
         proprios_data = validated_data.pop('proprios', [])
         
         with transaction.atomic():
+            # Apply incoming validated fields to the instance before saving
+            for attr, value in validated_data.items():
+                setattr(instance, attr, value)
+
             instance.save()
 
             # Récupérer les IDs actuels des propriétaires de l'unité pastorale
@@ -285,10 +289,10 @@ class TypeDExploitantSerializer(serializers.ModelSerializer):
     
 
 class ExploitantSerializer(serializers.ModelSerializer):
-    proprios = serializers.ListField(
+    membres = serializers.ListField(
         child=serializers.IntegerField(), write_only=True
     )
-    proprios_ids = serializers.SerializerMethodField(read_only=True)
+    membres_ids = serializers.SerializerMethodField(read_only=True)
 
     type_exploitant = serializers.PrimaryKeyRelatedField(
         queryset = TypeDExploitant.objects.all(), allow_null = True
@@ -302,26 +306,26 @@ class ExploitantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Exploitant
         read_only_fields = ['id_exploitant']
-        fields = ['id_exploitant', 'nom_exploitant', 'president', 'proprios', 'proprios_ids', 'type_exploitant', 'type_exploitant_detail']
+        fields = ['id_exploitant', 'nom_exploitant', 'president', 'membres', 'membres_ids', 'type_exploitant', 'type_exploitant_detail']
 
-    def get_proprios_ids(self, obj):
+    def get_membres_ids(self, obj):
         # Récupérer uniquement les IDs des éleveurs associés via la table `EtreCompose`
-        proprios = EtreCompose.objects.filter(exploitant=obj).values_list('eleveur_id', flat=True)
-        return list(proprios)
+        membres = EtreCompose.objects.filter(exploitant=obj).values_list('eleveur_id', flat=True)
+        return list(membres)
 
     def create(self, validated_data):
-        proprios_data = validated_data.pop('proprios', [])
+        membres_data = validated_data.pop('membres', [])
         exploitant = Exploitant.objects.create(**validated_data)
         
-        # Ajout des proprios dans la table EtreCompose
-        for eleveur_id in proprios_data:
+        # Ajout des membres dans la table EtreCompose
+        for eleveur_id in membres_data:
             eleveur = Eleveur.objects.get(id_eleveur=eleveur_id)
             EtreCompose.objects.create(exploitant=exploitant, eleveur=eleveur)
 
         return exploitant
 
     def update(self, instance, validated_data):
-        proprios_data = validated_data.pop('proprios', [])
+        membres_data = validated_data.pop('membres', [])
         instance.nom_exploitant = validated_data.get('nom_exploitant', instance.nom_exploitant)
         # instance.type = validated_data.get('type', instance.type)
         instance.president = validated_data.get('president', instance.president)
@@ -330,18 +334,18 @@ class ExploitantSerializer(serializers.ModelSerializer):
         with transaction.atomic():
             instance.save()
 
-            # Récupérer les IDs actuels des proprios de l'exploitant
-            proprios_actuels = set(EtreCompose.objects.filter(exploitant=instance).values_list('eleveur_id', flat=True))
-            nouveaux_proprios = set(proprios_data)
+            # Récupérer les IDs actuels des membres de l'exploitant
+            membres_actuels = set(EtreCompose.objects.filter(exploitant=instance).values_list('eleveur_id', flat=True))
+            nouveaux_membres = set(membres_data)
 
-            # Supprimer les proprios qui ne sont plus associés
-            proprios_a_supprimer = proprios_actuels - nouveaux_proprios
-            if proprios_a_supprimer:
-                EtreCompose.objects.filter(exploitant=instance, eleveur_id__in=proprios_a_supprimer).delete()
+            # Supprimer les membres qui ne sont plus associés
+            membres_a_supprimer = membres_actuels - nouveaux_membres
+            if membres_a_supprimer:
+                EtreCompose.objects.filter(exploitant=instance, eleveur_id__in=membres_a_supprimer).delete()
 
-            # Ajouter les nouveaux proprios
-            proprios_a_ajouter = nouveaux_proprios - proprios_actuels
-            for eleveur_id in proprios_a_ajouter:
+            # Ajouter les nouveaux membres
+            membres_a_ajouter = nouveaux_membres - membres_actuels
+            for eleveur_id in membres_a_ajouter:
                 eleveur = Eleveur.objects.get(id_eleveur=eleveur_id)
                 EtreCompose.objects.create(exploitant=instance, eleveur=eleveur)
 
