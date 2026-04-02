@@ -42,6 +42,25 @@ class UnitePastoraleSerializer(GeoFeatureModelSerializer):
                 pass
 
         return super().to_representation(instance)
+
+
+    def to_internal_value(self, data):
+        # on mappe les clés id et id_unite_pastorale à la clé properties.id_unite_pastorale
+        # assure la compatibilité avec le format GeoJson
+        data = dict(data)
+        props = dict(data.get('properties') or {})
+
+        # Map top-level "id" -> properties.id_unite_pastorale if missing
+        if 'id' in data and 'id_unite_pastorale' not in props:
+            props['id_unite_pastorale'] = data['id']
+
+        # Map top-level "id_unite_pastorale" -> properties.id_unite_pastorale if missing
+        if 'id_unite_pastorale' in data and 'id_unite_pastorale' not in props:
+            props['id_unite_pastorale'] = data['id_unite_pastorale']
+
+        data['properties'] = props
+        return super().to_internal_value(data)
+
         
     def get_proprios_ids(self, obj):
         # Récupérer uniquement les IDs des propriétaires associés via ProprietaireUnitePastorale
